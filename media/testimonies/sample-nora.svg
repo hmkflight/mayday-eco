@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1000" role="img" aria-labelledby="title desc">
+  <title id="title">Fictional portrait illustration of Nora</title><desc id="desc">A serene shoulders-up illustration of a person with wavy hair wearing a green blouse.</desc>
+  <rect width="800" height="1000" fill="#eadfd1"/><path d="M0 740c131-100 264-105 404-33 133 68 258 62 396-13v306H0z" fill="#c5d0b5"/><path d="M632 0h168v365c-75-55-132-129-168-218z" fill="#b7c89f"/>
+  <path d="M144 1000V849c0-143 112-240 256-240s256 97 256 240v151z" fill="#587a61"/><path d="M320 579h160v131c0 46-31 78-80 78s-80-32-80-78z" fill="#d89d77"/><ellipse cx="400" cy="385" rx="158" ry="207" fill="#e3aa83"/>
+  <path d="M242 419c-26-162 34-290 157-290 113 0 181 107 160 275-37-46-62-93-72-151-48 58-128 85-239 92z" fill="#503933"/><path d="M258 257c-42 82-32 217-5 296-73-47-88-168-47-269 18-43 39-71 71-95zM542 255c45 86 35 218 6 299 73-50 86-171 43-271-18-42-40-68-72-91z" fill="#503933"/>
+  <path d="M274 375c23-12 49-12 70 1M456 376c22-13 48-13 70-1" fill="none" stroke="#633f35" stroke-width="12" stroke-linecap="round"/><ellipse cx="326" cy="426" rx="10" ry="15" fill="#392923"/><ellipse cx="474" cy="426" rx="10" ry="15" fill="#392923"/><path d="M351 510c32 24 67 24 98 0" fill="none" stroke="#a45255" stroke-width="11" stroke-linecap="round"/><path d="M194 864c50-77 118-108 206-108s156 31 206 108" fill="none" stroke="#8eab8b" stroke-width="12" opacity=".9"/>
+</svg>

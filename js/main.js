@@ -159,6 +159,7 @@ async function initMotion() {
 
     const intro = gsap.timeline({ defaults: { ease: "power3.out" } });
     intro
+      .from(".hero__logo", { autoAlpha: 0, y: 10, duration: 0.6 }, 0)
       .from(".hero__headline .word", { yPercent: 115, duration: 1.1, stagger: 0.07 }, 0)
       .to(axes, { wght: 760, SOFT: 10, WONK: 1, duration: 1.4, onUpdate: applyAxes }, 0)
       .from(".hero__kicker", { autoAlpha: 0, y: 12, duration: 0.6 }, 0.15)

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1000" role="img" aria-labelledby="title desc">
+  <title id="title">Fictional portrait illustration of Maya</title><desc id="desc">A warm shoulders-up illustration of a smiling person in a rust sweater.</desc>
+  <rect width="800" height="1000" fill="#e8d9c2"/><path d="M0 760C112 666 226 647 400 680s285-10 400-108v428H0z" fill="#d6b98e"/><ellipse cx="640" cy="182" rx="115" ry="115" fill="#efdcae" opacity=".55"/>
+  <path d="M178 1000v-154c0-133 91-228 222-228s222 95 222 228v154z" fill="#a94f35"/><path d="M314 576h172v108c-1 52-37 88-86 88s-86-36-86-88z" fill="#b96f4c"/><ellipse cx="400" cy="389" rx="162" ry="207" fill="#c9825e"/>
+  <path d="M236 375c3-164 86-262 176-262 103 0 167 80 164 249-35-27-59-72-70-134-48 58-137 91-270 98z" fill="#342421"/><path d="M264 371c19 4 40-3 54-15M483 356c15 12 35 19 54 15" fill="none" stroke="#342421" stroke-width="15" stroke-linecap="round"/>
+  <ellipse cx="328" cy="419" rx="12" ry="16" fill="#30211e"/><ellipse cx="472" cy="419" rx="12" ry="16" fill="#30211e"/><path d="M353 508c29 22 65 22 94 0" fill="none" stroke="#8a3f37" stroke-width="12" stroke-linecap="round"/><path d="M222 845c48-70 102-93 178-93s130 23 178 93" fill="none" stroke="#f0cf9b" stroke-width="11" opacity=".8"/>
+</svg>

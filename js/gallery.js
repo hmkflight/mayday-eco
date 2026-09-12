@@ -94,7 +94,7 @@ function renderCard(t, isNew) {
       ? `<span class="card__handle">${platformIcon}${escapeHtml(t.handle)}</span>`
       : "";
 
-  return `<div class="card-wrap">
+  return `<div class="card-wrap${t.isSample ? " card-wrap--sample" : ""}">
     ${PUSHPIN_SVG}
     ${isNew ? `<span class="new-tag">new</span>` : ""}
     <article class="card torn">
@@ -150,15 +150,15 @@ export function renderGallery() {
   if (viewport) viewport.hidden = false;
   if (progress) progress.hidden = false;
 
-  const newestNonPlaceholder = valid.find((t) => !t.isPlaceholder);
+  const newestNonSample = valid.find((t) => !t.isSample && !t.isPlaceholder);
 
   track.innerHTML = valid
-    .map((t) => renderCard(t, !!(newestNonPlaceholder && t.id === newestNonPlaceholder.id)))
+    .map((t) => renderCard(t, !!(newestNonSample && t.id === newestNonSample.id)))
     .join("");
 
   activateYoutubeFacades(track);
 
-  const realCount = valid.filter((t) => !t.isPlaceholder).length;
+  const realCount = valid.filter((t) => !t.isSample && !t.isPlaceholder).length;
   if (countEl) {
     countEl.textContent = realCount > 0 ? `${realCount} stor${realCount === 1 ? "y" : "ies"} and counting` : "";
   }
