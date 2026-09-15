@@ -86,11 +86,13 @@ replace them before this goes live:
 |---|---|
 | `[MISSION_PARAGRAPH_ONE]` | `index.html` — `<!-- REPLACE-BEFORE-LAUNCH (1 of 3): mission copy -->`, in the `#mission` section |
 | `[MISSION_PARAGRAPH_TWO]` | `index.html` — same comment block, second `<p>` |
-| `[FORM_EMBED_GOES_HERE]` | `index.html` — `<!-- REPLACE-BEFORE-LAUNCH (2 of 3): paste your Google Forms / Tally embed iframe here -->`, in the `#share` section. Replace the whole placeholder `<p>` with your embed `<iframe>`. |
+| Submission-form embed | `index.html` — `<!-- REPLACE-BEFORE-LAUNCH (2 of 3) ... -->`, in the `#share` section. Replace the invitation card with a Google Forms or Tally iframe. |
 | `[LINKEDIN_URL]` | `index.html` — `<!-- REPLACE-BEFORE-LAUNCH (3 of 3): social URLs -->`, in the footer |
 | `[INSTAGRAM_URL]` | `index.html` — same comment block, second link |
 
 Also:
+
+- **Configure the submission form before launch:** require one upload field that accepts a photo **or** short video of the submitter from their wish-granting experience. Explain that the upload is reviewed to help keep the Wall of Wishes real; it must not request IDs, addresses, phone numbers, or other sensitive personal information. Ask submitters to upload only media they have permission to share and that does not disclose another person's private information. Keep consent to publish the story/media as a separate, explicit choice, and review every submission before publishing.
 
 - **Delete the three placeholder entries** in `js/testimonies.js` (`t-placeholder-001/002/003`).
   The console warns on every page load while any remain.

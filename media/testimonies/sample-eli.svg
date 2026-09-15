@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1000" role="img" aria-labelledby="title desc">
+  <title id="title">Fictional portrait illustration of Eli</title><desc id="desc">A natural shoulders-up illustration of a person with dark curly hair in a blue overshirt.</desc>
+  <rect width="800" height="1000" fill="#cbd9d4"/><path d="M0 688c143 56 241 33 391-17 135-45 262-41 409 15v314H0z" fill="#a7bfba"/><circle cx="141" cy="179" r="120" fill="#e9dcae" opacity=".7"/>
+  <path d="M149 1000V843c0-137 105-232 251-232s251 95 251 232v157z" fill="#365b70"/><path d="M324 590h152v118c0 47-30 78-76 78s-76-31-76-78z" fill="#85553f"/><ellipse cx="400" cy="389" rx="155" ry="204" fill="#9b664c"/>
+  <path d="M250 404c-20-167 60-282 156-282 107 0 177 96 150 276-31-43-51-92-58-145-34 39-99 72-198 83-13 28-29 50-50 68z" fill="#272b2d"/><circle cx="287" cy="188" r="48" fill="#272b2d"/><circle cx="348" cy="149" r="54" fill="#272b2d"/><circle cx="424" cy="146" r="58" fill="#272b2d"/><circle cx="497" cy="180" r="54" fill="#272b2d"/>
+  <path d="M279 370c22-13 46-13 68-1M453 369c23-12 47-12 68 1" fill="none" stroke="#382b27" stroke-width="13" stroke-linecap="round"/><ellipse cx="326" cy="421" rx="11" ry="15" fill="#29211f"/><ellipse cx="474" cy="421" rx="11" ry="15" fill="#29211f"/><path d="M355 511c29 18 61 18 90 0" fill="none" stroke="#64383b" stroke-width="11" stroke-linecap="round"/><path d="M204 854c60-74 119-98 196-98s136 24 196 98" fill="none" stroke="#7697a5" stroke-width="12" opacity=".8"/>
+</svg>
