@@ -710,6 +710,7 @@ section[id] { scroll-margin-top: var(--header-h); }
 .wall__track--stories .card-wrap .card { width: 100%; }
 .wall__track--stories .card__media { aspect-ratio: 4/3; }
 .wall__track--stories .card__media img { object-fit: contain; }
+.card__video-link { font-family: var(--font-ui); font-size: var(--fs-small); margin-bottom: var(--sp-3); text-decoration: underline; }
 
 .card__footer {
   display: flex;

@@ -1,5 +1,5 @@
 // mayday.eco — init, gallery render, header/menu behavior, and all motion.
-import { renderGallery } from "./gallery.js?v=20260922";
+import { renderGallery } from "./gallery.js?v=20260922b";
 import { configureStoryLinks, loadApprovedStories } from "./stories.js";
 
 configureStoryLinks();

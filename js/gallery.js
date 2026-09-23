@@ -64,8 +64,9 @@ function renderMedia(t) {
   if (t.mediaType === "video-drive") {
     return `<div class="card__media">
       <iframe src="https://drive.google.com/file/d/${encodeURIComponent(t.driveFileId)}/preview"
-        title="${escapeHtml(t.name)}'s video testimony" loading="lazy" allow="fullscreen" allowfullscreen></iframe>
-    </div>`;
+        title="${escapeHtml(t.name)}'s video testimony" loading="lazy" allow="autoplay; fullscreen" allowfullscreen></iframe>
+    </div>
+    <a class="card__video-link" href="https://drive.google.com/file/d/${encodeURIComponent(t.driveFileId)}/view" target="_blank" rel="noopener noreferrer">Open video in a new tab</a>`;
   }
   if (t.mediaType === "video-youtube") {
     return `<div class="card__media">
