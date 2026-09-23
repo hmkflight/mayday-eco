@@ -684,6 +684,7 @@ section[id] { scroll-margin-top: var(--header-h); }
   flex: 1;
 }
 .card-wrap--sample .card__excerpt { font-size: calc(var(--fs-body) * 0.94); margin-bottom: var(--sp-3); }
+.card__excerpt--full { display: block; overflow: visible; white-space: pre-wrap; overflow-wrap: anywhere; }
 
 .card__footer {
   display: flex;

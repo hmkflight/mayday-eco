@@ -28,7 +28,7 @@ function fieldsMissing(t) {
   const missing = [];
   if (!t.id) missing.push("id");
   if (!t.name) missing.push("name");
-  if (!t.excerpt) missing.push("excerpt");
+  if (t.mediaType === "photo" && !t.excerpt) missing.push("excerpt");
   if (!t.date) missing.push("date");
   if (!t.mediaType) missing.push("mediaType");
 
@@ -37,7 +37,8 @@ function fieldsMissing(t) {
     if (!t.alt) missing.push("alt");
   } else if (t.mediaType === "video-file") {
     if (!t.src) missing.push("src");
-    if (!t.poster) missing.push("poster");
+  } else if (t.mediaType === "video-drive") {
+    if (!/^[\w-]{10,200}$/.test(t.driveFileId || "")) missing.push("driveFileId");
   } else if (t.mediaType === "video-youtube") {
     if (!t.youtubeId) missing.push("youtubeId");
     if (!t.poster) missing.push("poster");
@@ -55,9 +56,15 @@ function renderMedia(t) {
   }
   if (t.mediaType === "video-file") {
     return `<div class="card__media">
-      <video controls preload="none" poster="${escapeHtml(t.poster)}">
+      <video controls preload="metadata"${t.poster ? ` poster="${escapeHtml(t.poster)}"` : ""} aria-label="${escapeHtml(t.name)}'s video testimony">
         <source src="${escapeHtml(t.src)}">
       </video>
+    </div>`;
+  }
+  if (t.mediaType === "video-drive") {
+    return `<div class="card__media">
+      <iframe src="https://drive.google.com/file/d/${encodeURIComponent(t.driveFileId)}/preview"
+        title="${escapeHtml(t.name)}'s video testimony" loading="lazy" allow="fullscreen" allowfullscreen></iframe>
     </div>`;
   }
   if (t.mediaType === "video-youtube") {
@@ -99,7 +106,7 @@ function renderCard(t, isNew) {
     ${isNew ? `<span class="new-tag">new</span>` : ""}
     <article class="card torn">
       ${renderMedia(t)}
-      <p class="card__excerpt">${escapeHtml(t.excerpt)}</p>
+      ${t.excerpt ? `<p class="card__excerpt${t.isSample ? "" : " card__excerpt--full"}">${escapeHtml(t.excerpt)}</p>` : ""}
       <div class="card__footer">
         <span class="card__name">${escapeHtml(t.name)}</span>
         ${handle}
@@ -108,7 +115,7 @@ function renderCard(t, isNew) {
   </div>`;
 }
 
-export function renderGallery() {
+export function renderGallery(approvedStories = []) {
   const track = document.getElementById("wall-track");
   const viewport = document.querySelector(".wall__viewport");
   const progress = document.getElementById("wall-progress");
@@ -116,7 +123,7 @@ export function renderGallery() {
   const countEl = document.getElementById("wall-count");
   if (!track) return;
 
-  const sorted = [...testimonies].sort((a, b) => new Date(b.date) - new Date(a.date));
+  const sorted = [...testimonies, ...approvedStories].sort((a, b) => new Date(b.date) - new Date(a.date));
 
   const valid = [];
   let skipped = 0;

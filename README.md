@@ -7,9 +7,13 @@ TikTok handle is displayed and linked so they get public credit. All testimonies
 together on the Wall of Wishes, so the site becomes a growing, visible chain of people
 inspiring other people to go grant a wish too.
 
-It's a static site: no build step, no backend, no database. Testimonies live in a plain
-JavaScript array (`js/testimonies.js`) and form submissions are handled by an embedded
-third-party form (Tally or Google Forms).
+The website remains static with no build step. Existing sample stories live in
+`js/testimonies.js`. The new Google Forms integration uses a private review sheet
+and Google Apps Script to publish an approved-only feed. The published responder
+and feed URLs are configured in `js/story-config.js`.
+See [Share Your Story setup and review](google-apps-script/SETUP.md).
+
+Run local workflow checks with `node --test tests/stories.test.mjs`.
 
 ## Running locally
 
@@ -24,7 +28,7 @@ Then open `http://localhost:8000`.
 Any static file server works — this is plain HTML/CSS/JS with no build step, so there's
 nothing to install or compile.
 
-## How to add a testimony
+## How to add a testimony manually
 
 1. Drop the photo or video file in `media/testimonies/` (skip this step for the YouTube
    path — just note the video ID).
@@ -40,13 +44,13 @@ nothing else to wire up.
 ```js
 {
   id: "t-XXX",                 // any unique string, e.g. "t-014"
-  name: "Full Name",           // or "Anonymous" if they asked not to be named
+  name: "Full Name",           // required; submissions are not anonymous
   handle: "@their_handle",     // their Instagram/TikTok handle, or null if none given
   handleUrl: "https://instagram.com/their_handle", // full profile URL, or null
   platform: "instagram",       // "instagram" | "tiktok" | null — controls which glyph shows
   mediaType: "photo",          // "photo" | "video-file" | "video-youtube"
   src: "media/testimonies/your-file.jpg", // photo or .mp4 path; null for video-youtube
-  poster: null,                // REQUIRED for video-file and video-youtube — a still image path
+  poster: null,                // optional for video-file; required for video-youtube
   youtubeId: null,             // REQUIRED for video-youtube — just the 11-char video ID
   alt: "Plain description of the image, for screen readers",
   excerpt: "Two to three sentences, in their words, about how granting the wish felt.",
@@ -79,24 +83,13 @@ you through the DNS records in their dashboard.
 
 ## Before launch — checklist
 
-Five bracketed tokens live under three `REPLACE-BEFORE-LAUNCH` comments. Find them and
-replace them before this goes live:
-
-| Token | File / location |
-|---|---|
-| `[MISSION_PARAGRAPH_ONE]` | `index.html` — `<!-- REPLACE-BEFORE-LAUNCH (1 of 3): mission copy -->`, in the `#mission` section |
-| `[MISSION_PARAGRAPH_TWO]` | `index.html` — same comment block, second `<p>` |
-| Submission-form embed | `index.html` — `<!-- REPLACE-BEFORE-LAUNCH (2 of 3) ... -->`, in the `#share` section. Replace the invitation card with a Google Forms or Tally iframe. |
-| `[LINKEDIN_URL]` | `index.html` — `<!-- REPLACE-BEFORE-LAUNCH (3 of 3): social URLs -->`, in the footer |
-| `[INSTAGRAM_URL]` | `index.html` — same comment block, second link |
-
-Also:
-
-- **Configure the submission form before launch:** require one upload field that accepts a photo **or** short video of the submitter from their wish-granting experience. Explain that the upload is reviewed to help keep the Wall of Wishes real; it must not request IDs, addresses, phone numbers, or other sensitive personal information. Ask submitters to upload only media they have permission to share and that does not disclose another person's private information. Keep consent to publish the story/media as a separate, explicit choice, and review every submission before publishing.
-
-- **Delete the three placeholder entries** in `js/testimonies.js` (`t-placeholder-001/002/003`).
-  The console warns on every page load while any remain.
-- **Add 2–3 real testimonies** so the wall isn't empty on day one.
+- Review the configured Google Form and private approval sheet using
+  [the review guide](google-apps-script/SETUP.md). Adults may submit their own story;
+  parents/legal guardians may submit a child's story with additional consent.
+- Keep every new response Pending until reviewed. Child stories additionally
+  require the reviewer to check Guardian Consent Verified before approval.
+- Existing fictional sample cards remain labeled. Remove them from
+  `js/testimonies.js` when you are ready to replace them with real approved stories.
 - `assets/og-image.png` was generated in this build from `assets/og-image.svg` via
   `librsvg` (`rsvg-convert -w 1200 -h 630 -o assets/og-image.png assets/og-image.svg`). If
   you edit `og-image.svg` later, re-run that command to regenerate the PNG — social

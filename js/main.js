@@ -1,7 +1,18 @@
 // mayday.eco — init, gallery render, header/menu behavior, and all motion.
 import { renderGallery } from "./gallery.js";
+import { configureStoryLinks, loadApprovedStories } from "./stories.js";
 
+configureStoryLinks();
 renderGallery();
+const storiesReady = loadApprovedStories().then((stories) => {
+  if (stories.length) renderGallery(stories);
+}).catch(() => {
+  const status = document.getElementById("wall-status");
+  if (status) {
+    status.hidden = false;
+    status.textContent = "New stories are temporarily unavailable. Please try again later.";
+  }
+});
 
 // Reduced motion never runs the hero intro tween (Context A below), so the
 // headline needs its settled, post-intro variable-font weight applied directly.
@@ -293,4 +304,7 @@ async function initMotion() {
   document.fonts.ready.then(() => ScrollTrigger.refresh());
 }
 
-initMotion();
+// Build scroll measurements after remote cards have loaded.
+storiesReady.then(() => {
+  if (typeof gsap !== "undefined" && typeof ScrollTrigger !== "undefined") initMotion();
+});

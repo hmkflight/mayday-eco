@@ -43,7 +43,7 @@
       <a class="squiggle-link" href="#wall">Wall of Wishes
         <svg class="squiggle" viewBox="0 0 60 8" preserveAspectRatio="none" aria-hidden="true" focusable="false"><path pathLength="1" d="M1 5 Q10 1 18 5 T36 4 T54 6 T59 3"/></svg>
       </a>
-      <a class="squiggle-link" href="#share">Share Your Story
+      <a class="squiggle-link" href="https://docs.google.com/forms/d/e/1FAIpQLSe57fkRAFkiVwyGQbiuRwxMwMdPUR6MFF96RRPcGPWd0RtGZw/viewform?usp=header" data-story-link>Share Your Story
         <svg class="squiggle" viewBox="0 0 60 8" preserveAspectRatio="none" aria-hidden="true" focusable="false"><path pathLength="1" d="M1 5 Q10 1 18 5 T36 4 T54 6 T59 3"/></svg>
       </a>
     </nav>
@@ -62,7 +62,7 @@
   <a href="#mission">Mission</a>
   <a href="#how">How It Works</a>
   <a href="#wall">Wall of Wishes</a>
-  <a href="#share">Share Your Story</a>
+  <a href="https://docs.google.com/forms/d/e/1FAIpQLSe57fkRAFkiVwyGQbiuRwxMwMdPUR6MFF96RRPcGPWd0RtGZw/viewform?usp=header" data-story-link>Share Your Story</a>
   <a class="stamp-btn" href="https://onesimplewish.com" target="_blank" rel="noopener noreferrer">Grant a Wish →</a>
 </div>
 
@@ -82,7 +82,7 @@
           <p class="hero__sub">mayday.eco is where people who've granted a wish through One Simple Wish come back to share their story — and inspire the next person to do the same.</p>
           <div class="hero__actions">
             <a class="stamp-btn" href="https://onesimplewish.com" target="_blank" rel="noopener noreferrer">Grant a Wish →</a>
-            <a class="squiggle-link" href="#share">Share Your Story
+            <a class="squiggle-link" href="https://docs.google.com/forms/d/e/1FAIpQLSe57fkRAFkiVwyGQbiuRwxMwMdPUR6MFF96RRPcGPWd0RtGZw/viewform?usp=header" data-story-link>Share Your Story
               <svg class="squiggle" viewBox="0 0 90 8" preserveAspectRatio="none" aria-hidden="true" focusable="false"><path pathLength="1" d="M1 5 Q14 1 27 5 T54 4 T81 6 T89 3"/></svg>
             </a>
           </div>
@@ -168,9 +168,10 @@
         <h2 id="wall-heading">The wall of wishes</h2>
         <p class="wall__sub">Every card here is someone who granted a wish and came back to say what it did to them.</p>
         <p class="wall__invite">Your turn. Tell us what granting a wish meant to you.</p>
-        <a class="stamp-btn wall__invite-link" href="#share">Share Your Story</a>
+        <a class="stamp-btn wall__invite-link" href="https://docs.google.com/forms/d/e/1FAIpQLSe57fkRAFkiVwyGQbiuRwxMwMdPUR6MFF96RRPcGPWd0RtGZw/viewform?usp=header" data-story-link>Share Your Story</a>
         <p class="wall__demo-note">These are fictional sample stories, shown to preview the wall.</p>
         <p class="wall__count" id="wall-count"></p>
+        <p id="wall-status" role="status" hidden></p>
       </div>
     </div>
 
@@ -186,7 +187,7 @@
 
     <div class="wall__empty" id="wall-empty" hidden>
       <p>The wall is waiting for its first story.</p>
-      <a class="stamp-btn" href="#share">Share Your Story</a>
+      <a class="stamp-btn" href="https://docs.google.com/forms/d/e/1FAIpQLSe57fkRAFkiVwyGQbiuRwxMwMdPUR6MFF96RRPcGPWd0RtGZw/viewform?usp=header" data-story-link>Share Your Story</a>
     </div>
   </section>
 
@@ -196,7 +197,7 @@
         <p class="share__eyebrow">The wall has room for you</p>
         <h2 id="share-heading">You granted a wish. Tell us what it meant to you.</h2>
         <p class="share__body">Every act of kindness has a story behind it. Share a photo, video, or a few words about your experience — your story might inspire the next person to say yes.</p>
-        <a class="stamp-btn share__cta" href="#form-embed" aria-label="Learn how to share your story">✦ Share Your Story →</a>
+        <a class="stamp-btn share__cta" href="https://docs.google.com/forms/d/e/1FAIpQLSe57fkRAFkiVwyGQbiuRwxMwMdPUR6MFF96RRPcGPWd0RtGZw/viewform?usp=header" data-story-link aria-label="Share your story on Google Forms">✦ Share Your Story →</a>
         <p class="share__arrow" aria-hidden="true">your story belongs here ↘</p>
       </div>
 
@@ -218,17 +219,17 @@
         </article>
       </div>
 
-      <!-- REPLACE-BEFORE-LAUNCH (2 of 3): replace this invitation card with a Google Forms or Tally embed iframe. Configure a required photo OR video upload field, plus separate publication permission; see README.md. -->
+      <!-- The completed Google Form is configured in js/story-config.js. -->
       <div class="form-embed" id="form-embed" data-reveal aria-labelledby="form-embed-heading">
         <div class="form-embed__placeholder">
-          <p class="form-embed__kicker">Coming soon</p>
-          <h3 id="form-embed-heading">The story form is on its way.</h3>
-          <p>This is where you’ll be able to add your page to the wall. Every story will include a required photo or short video for review before anything is published.</p>
+          <p class="form-embed__kicker" id="story-form-status">Share your experience</p>
+          <h3 id="form-embed-heading">Your story starts here.</h3>
+          <p id="story-form-detail">Choose a photo and written story or a video. Google sign-in is required to upload your file. Your name is required, and every submission is reviewed before publication.</p>
           <p class="form-embed__detail">You’ll only need to share one — a photo <em>or</em> video of yourself from your wish-granting experience. Please only share media you have permission to use, and keep other people’s private information out of frame.</p>
         </div>
       </div>
 
-      <p class="share__note">Every submission is reviewed by the mayday.eco team before it can appear on the wall. Permission to publish your story and media will be a separate choice, and you can always ask us to take it down.</p>
+      <p class="share__note">Every submission is reviewed by the mayday.eco team before it can appear on the wall. The form requires your permission to publish your name, story, photo/video, and social media username (if provided), and you can always ask us to take it down.</p>
     </div>
   </section>
 
