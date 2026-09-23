@@ -205,7 +205,7 @@ test('unconfigured and failed feeds do not expose or fabricate stories', async (
 
 test('gallery renders photos and captionless videos and escapes submitted HTML', () => {
   const h = harness(); h.submit('photo'); h.submit('video'); h.decide(2, 'Approved'); h.decide(3, 'Approved');
-  const track = { innerHTML: '', querySelectorAll: () => [] };
+  const track = { innerHTML: '', querySelectorAll: () => [], classList: { toggle() {} } };
   const elements = { 'wall-track': track, 'wall-progress': {}, 'wall-empty': {}, 'wall-count': {} };
   globalThis.document = { getElementById: id => elements[id], querySelector: () => ({}) };
   try {

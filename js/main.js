@@ -229,7 +229,7 @@ async function initMotion() {
     const getDistance = () =>
       Math.max(0, track.scrollWidth - document.documentElement.clientWidth + 120);
 
-    const wallTween = gsap.to(track, {
+    const wallTween = track.classList.contains("wall__track--stories") ? null : gsap.to(track, {
       x: () => -getDistance(),
       ease: "none",
       scrollTrigger: {
@@ -260,6 +260,7 @@ async function initMotion() {
     });
 
     gsap.utils.toArray(".wall__track .card").forEach((card) => {
+      if (!wallTween) return;
       gsap.from(card, {
         scale: 0.92, duration: 0.38, ease: "back.out(2)",
         scrollTrigger: {

@@ -686,6 +686,31 @@ section[id] { scroll-margin-top: var(--header-h); }
 .card-wrap--sample .card__excerpt { font-size: calc(var(--fs-body) * 0.94); margin-bottom: var(--sp-3); }
 .card__excerpt--full { display: block; overflow: visible; white-space: pre-wrap; overflow-wrap: anywhere; }
 
+/* Approved stories need room for complete testimony and accessible media. */
+.wall__track.wall__track--stories {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 320px));
+  grid-template-rows: none;
+  justify-content: center;
+  align-items: start;
+  width: 100%;
+  min-height: 0;
+  padding: var(--sp-8) var(--sp-6);
+  gap: var(--sp-8);
+  transform: none !important;
+}
+.wall__track--stories .card-wrap,
+.wall__track--stories .card-wrap.card-wrap--sample {
+  width: 100%;
+  grid-column: auto;
+  grid-row: auto;
+  justify-self: center;
+  align-self: start;
+}
+.wall__track--stories .card-wrap .card { width: 100%; }
+.wall__track--stories .card__media { aspect-ratio: 4/3; }
+.wall__track--stories .card__media img { object-fit: contain; }
+
 .card__footer {
   display: flex;
   align-items: center;

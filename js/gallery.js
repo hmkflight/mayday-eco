@@ -158,6 +158,8 @@ export function renderGallery(approvedStories = []) {
   if (progress) progress.hidden = false;
 
   const newestNonSample = valid.find((t) => !t.isSample && !t.isPlaceholder);
+  track.classList.toggle("wall__track--stories", !!newestNonSample);
+  if (progress) progress.hidden = !!newestNonSample;
 
   track.innerHTML = valid
     .map((t) => renderCard(t, !!(newestNonSample && t.id === newestNonSample.id)))
