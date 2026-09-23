@@ -1,5 +1,9 @@
 # mayday.eco
 
+Live website: https://hmkflight.github.io/mayday-eco/
+
+GitHub Pages publishes the root of `master`. The custom domain is not connected.
+
 **The Kindness Ledger.** mayday.eco is a place where people who've granted a wish on
 [One Simple Wish](https://onesimplewish.com) come back to post a short testimony — a
 video, or a photo plus a few sentences — about how it felt to give. Their Instagram or

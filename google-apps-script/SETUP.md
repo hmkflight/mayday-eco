@@ -63,7 +63,32 @@ Display-cell edits do not change approved stories: publication uses the original
 Form response. Do not programmatically change Decision using the Sheets API;
 Google on-edit triggers fire for human edits in Sheets, not API writes.
 
-## Validation
+## Completed live validation — September 22, 2026
+
+Published site: https://hmkflight.github.io/mayday-eco/
+GitHub Pages serves the root of `master`; pushes publish updates. The custom
+`mayday.eco` domain is not connected (DNS did not resolve during setup).
+
+- Followed the website button into the published form.
+- Submitted a labeled synthetic PNG/photo story as an adult and a labeled MP4
+  through the parent/guardian path. Both required their own upload only.
+- Verified the exact confirmation message, required identity and consent,
+  photo writing prompts, video prompts, and optional blank video description/handle.
+- Both responses arrived Pending in the private review sheet and were absent
+  from the anonymous public feed.
+- A human edit approving the photo published it. Attempting to approve the
+  guardian video first failed closed, reset it to Pending, and explained the
+  required guardian verification. Checking verification and approving published it.
+- Verified approved cards on the live Pages site, complete photo text and handle,
+  anonymous photo display and video playback, including the embedded player in
+  a 400px mobile viewport. Added playback permission and a direct-view fallback.
+- Rejected both tests through Sheets. Verified empty public feed, no test cards
+  after site reload, cleared published snapshots, and owner-only access on both
+  original uploads and formerly public media copies. Test rows remain Rejected
+  in the private sheet as an audit trail.
+- All 11 local workflow tests passed; `git diff --check` passed.
+
+## Repeat validation after changes
 
 Local checks: `node --test tests/stories.test.mjs`. These use mocked Google
 services to exercise pending/approved/rejected states, guardian consent, privacy,
