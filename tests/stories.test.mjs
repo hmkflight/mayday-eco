@@ -61,7 +61,6 @@ function harness() {
     const answers = {
       'Full Name': '<img src=x onerror=alert(1)>', 'Email Address': 'private@example.test',
       'Instagram or TikTok Username': '@example',
-      'Age confirmation': [vm.runInContext('ADULT', context)],
       'Who is submitting this story?': vm.runInContext('SELF', context),
       'Permission to share': [vm.runInContext('PERMISSION', context)],
       'Your story and media': [vm.runInContext('OWN_STORY', context)],
@@ -84,7 +83,7 @@ function harness() {
 }
 
 for (const type of ['photo', 'video']) {
-  test(`${type}: submission → private review → approval → public feed → withdrawal → reapproval`, () => {
+  test(`${type}: submission without age confirmation → private review → approval → public feed → withdrawal → reapproval`, () => {
     const h = harness();
     const { source, fileId } = h.submit(type);
     assert.equal(h.rows[1][0], 'Pending');
@@ -113,9 +112,9 @@ for (const type of ['photo', 'video']) {
   });
 }
 
-test('required consent, age, photo text and upload are enforced again at publication', () => {
+test('required consent, photo text and upload are enforced again at publication', () => {
   for (const overrides of [
-    { 'Permission to share': [] }, { 'Your story and media': [] }, { 'Age confirmation': [] },
+    { 'Permission to share': [] }, { 'Your story and media': [] },
     { 'Full Name': '' }, { 'Email Address': '' }, { 'Tell Us Your Story': '' }, { 'Upload a Photo of Yourself': [] },
   ]) {
     const h = harness(); h.submit('photo', overrides);

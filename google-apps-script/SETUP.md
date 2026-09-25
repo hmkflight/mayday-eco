@@ -12,6 +12,25 @@ approved-only web app URL are configured in `js/story-config.js`.
 - Respond: https://docs.google.com/forms/d/e/1FAIpQLSe57fkRAFkiVwyGQbiuRwxMwMdPUR6MFF96RRPcGPWd0RtGZw/viewform
 - Approved feed: https://script.google.com/macros/s/AKfycbzZsaAMQ4cmxh3c-Q1N8GSt_nT7W1thEL49NuAzc684k-eDZg_md1-5t7Drfv5d3c9P/exec
 
+## Remove the live age confirmation question
+
+The repository no longer creates or validates **Age confirmation**. Pushing to
+GitHub updates the website only; the existing Google Form and Apps Script must
+be updated separately:
+
+1. In the Automation editor linked above, update `Code.gs` from this repository
+   and save it **before deleting the question**. The existing review triggers
+   must use the updated validation so responses without age confirmation can
+   enter review. Keep the existing triggers and Script Properties.
+2. In the Form editor linked above, delete only **Age confirmation** (the checkbox
+   “I confirm that I am 18 years of age or older.” / “Are you 18 or older?”).
+   Keep every other question, section routing, and required photo/video upload.
+3. Check a new submission reaches Pending and follows the existing review flow.
+
+Do not rerun `prepareForm`; it is for the original draft, not live form updates.
+The website references the responder URL in `js/story-config.js` and the
+`data-story-link` anchors in `index.html`; `js/stories.js` applies that URL.
+
 ## Recreate setup (already completed)
 
 1. In the Apps Script project, save `Code.gs` and run `prepareForm` once. Review

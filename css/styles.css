@@ -545,7 +545,6 @@ section[id] { scroll-margin-top: var(--header-h); }
 .wall__sub { font-family: var(--font-ui); color: var(--ink-soft); max-width: 52ch; margin-inline: auto; margin-bottom: var(--sp-3); }
 .wall__invite { font-family: var(--font-display); font-size: var(--fs-h3); color: var(--ink); margin: var(--sp-5) auto var(--sp-3); }
 .wall__invite-link { margin-bottom: var(--sp-5); }
-.wall__demo-note { font-family: var(--font-ui); font-size: var(--fs-small); color: var(--ink-soft); margin: 0 auto var(--sp-3); }
 .wall__count { font-family: var(--font-hand); color: var(--seal); font-size: var(--fs-h3); }
 
 .wall__viewport { position: relative; overflow: hidden; }

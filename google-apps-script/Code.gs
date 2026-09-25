@@ -9,7 +9,6 @@ const PHOTO = '📸 Photo + Written Story';
 const VIDEO = '🎥 Video';
 const PERMISSION = 'I give One Simple Wish permission to display my name, photo/video, testimony, and social media username (if provided) on the One Simple Wish website and social media to share my story and show the impact of One Simple Wish.';
 const OWN_STORY = 'I confirm that this is my own story and that I have permission to submit the photo/video and information included in this form.';
-const ADULT = 'I confirm that I am 18 years of age or older.';
 const SELF = 'I am sharing my own story';
 const GUARDIAN = 'I am a parent/legal guardian submitting a child’s story';
 const GUARDIAN_PERMISSION = 'I confirm that I am this child’s parent or legal guardian and authorize One Simple Wish to publish the child’s name, photo/video, story, and social media username (if provided) on its website and social media. I have reviewed this submission and consent to its use.';
@@ -31,7 +30,6 @@ function prepareForm() {
     .setValidation(FormApp.createTextValidation().requireTextIsEmail().build());
   form.addTextItem().setTitle('Instagram or TikTok Username')
     .setHelpText("If you'd like us to credit you when we share your story, enter your Instagram or TikTok username.\nExample: @username");
-  form.addCheckboxItem().setTitle('Age confirmation').setChoiceValues([ADULT]).setRequired(true);
   const role = form.addMultipleChoiceItem().setTitle('Who is submitting this story?').setRequired(true);
   const guardianSection = form.addPageBreakItem().setTitle('Parent / Legal Guardian Consent');
   form.addTextItem().setTitle('Parent / Legal Guardian Full Name').setRequired(true);
@@ -64,7 +62,7 @@ function prepareForm() {
 function validateForm_() {
   const form = FormApp.openById(FORM_ID);
   const titles = form.getItems().map(item => item.getTitle());
-  ['Full Name', 'Email Address', 'Age confirmation', 'How would you like to share your story?',
+  ['Full Name', 'Email Address', 'How would you like to share your story?',
     'Tell Us Your Story', 'Permission to share', 'Your story and media', 'Who is submitting this story?',
     'Parent / Legal Guardian Full Name', 'Parent / Legal Guardian Email Address', 'Parent / Legal Guardian Permission'].forEach(title => {
     if (titles.filter(t => t === title).length !== 1) throw new Error('Missing or duplicate question: ' + title);
@@ -135,9 +133,9 @@ function storyFromResponse_(response) {
       (guardian && (!text(a['Parent / Legal Guardian Full Name']) || !text(a['Parent / Legal Guardian Email Address']) ||
         !checked_(a['Parent / Legal Guardian Permission'], GUARDIAN_PERMISSION))) ||
       !checked_(a['Permission to share'], PERMISSION) || !checked_(a['Your story and media'], OWN_STORY) ||
-      !checked_(a['Age confirmation'], ADULT) || !Array.isArray(files) || files.length !== 1 ||
+      !Array.isArray(files) || files.length !== 1 ||
       !/^[\w-]{10,200}$/.test(files[0]) || (photo && !text(a['Tell Us Your Story']))) {
-    throw new Error('Required identity, media, story, age, or permission is missing. Do not publish.');
+    throw new Error('Required identity, media, story, or permission is missing. Do not publish.');
   }
   return {
     id: response.getId(), name: text(a['Full Name']), email: text(a['Email Address']),
