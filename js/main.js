@@ -184,6 +184,26 @@ async function initMotion() {
       scrollTrigger: { ...hst, onUpdate: applyAxes },
     });
     gsap.to(".hero__inner", { yPercent: -12, autoAlpha: 0.25, ease: "none", scrollTrigger: { ...hst } });
+    gsap.to(".hero__doodles--left", {
+      yPercent: -18, rotation: -3, ease: "none",
+      scrollTrigger: { ...hst },
+    });
+    gsap.to(".hero__doodles--right", {
+      yPercent: 24, rotation: 5, ease: "none",
+      scrollTrigger: { ...hst },
+    });
+    gsap.to(".hero__scrap--top", {
+      y: -18, rotation: 10, ease: "none",
+      scrollTrigger: { ...hst },
+    });
+
+    // A quiet ripple follows each meaningful section into view.
+    gsap.utils.toArray(".mission__card-wrap, .how__step, .wall__head, .share__intro").forEach((el) => {
+      gsap.fromTo(el, { "--ripple-scale": 0.8, "--ripple-opacity": 0 }, {
+        "--ripple-scale": 1.15, "--ripple-opacity": 0.5, duration: 1.1, ease: "power2.out",
+        scrollTrigger: { trigger: el, start: "top 82%", once: true },
+      });
+    });
 
     // --- Generic section reveals (unpinned elements) ---
     gsap.utils.toArray("[data-reveal]").forEach((el) => {
