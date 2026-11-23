@@ -2,6 +2,10 @@
 import { renderGallery } from "./gallery.js?v=20260922b";
 import { configureStoryLinks, loadApprovedStories } from "./stories.js";
 
+const motionCanRun = typeof gsap !== "undefined" && typeof ScrollTrigger !== "undefined" &&
+  !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+if (motionCanRun) document.documentElement.classList.add("motion-pending");
+
 configureStoryLinks();
 renderGallery();
 const storiesReady = loadApprovedStories().then((stories) => {
@@ -140,8 +144,11 @@ document.addEventListener("click", (e) => {
 
 // ---------- Motion ----------
 async function initMotion() {
+  if (initMotion.started) return;
+  initMotion.started = true;
   gsap.registerPlugin(ScrollTrigger);
-  await ensureLenis();
+  ScrollTrigger.config({ ignoreMobileResize: true });
+  await Promise.all([ensureLenis(), document.fonts.ready]);
 
   const mm = gsap.matchMedia();
 
@@ -149,6 +156,8 @@ async function initMotion() {
   mm.add("(prefers-reduced-motion: no-preference)", () => {
     let lenis = null;
     let raf = null;
+    const refreshOnLoad = () => ScrollTrigger.refresh();
+    window.addEventListener("load", refreshOnLoad, { once: true, passive: true });
 
     if (typeof Lenis === "function") {
       lenis = new Lenis({ lerp: 0.1, smoothWheel: true, wheelMultiplier: 1, autoRaf: false });
@@ -214,6 +223,7 @@ async function initMotion() {
     });
 
     return () => {
+      window.removeEventListener("load", refreshOnLoad);
       if (lenis) {
         gsap.ticker.remove(raf);
         lenis.destroy();
@@ -323,9 +333,12 @@ async function initMotion() {
   });
 
   document.fonts.ready.then(() => ScrollTrigger.refresh());
+  document.documentElement.classList.remove("motion-pending");
 }
+initMotion.started = false;
 
 // Build scroll measurements after remote cards have loaded.
 storiesReady.then(() => {
   if (typeof gsap !== "undefined" && typeof ScrollTrigger !== "undefined") initMotion();
+  else document.documentElement.classList.remove("motion-pending");
 });

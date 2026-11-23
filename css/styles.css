@@ -909,6 +909,21 @@ section[id] { scroll-margin-top: var(--header-h); }
 [data-reveal],
 [data-reveal-pinned] { opacity: 1; transform: none; }
 
+/* Keep scroll-triggered content out of the first paint while the motion
+   system waits for fonts and the approved-story feed. GSAP owns the reveal
+   values once initialization completes, so this prevents a visible flash
+   without changing the no-JS or reduced-motion fallback. */
+html.motion-pending [data-reveal],
+html.motion-pending [data-reveal-pinned],
+html.motion-pending .hero__logo,
+html.motion-pending .hero__headline .word,
+html.motion-pending .hero__kicker,
+html.motion-pending .hero__sub,
+html.motion-pending .hero__actions > *,
+html.motion-pending .hero__annotation,
+html.motion-pending .how__step,
+html.motion-pending .wall__track .card { visibility: hidden; }
+
 /* ---------- 15. Scrapbook elevation ---------- */
 :root {
   --paper-glow: #fffaf2;
@@ -988,7 +1003,7 @@ body {
 .how { background: linear-gradient(180deg, var(--paper) 0%, #f7f0e6 100%); }
 .how__head h2 { font-size: clamp(2.6rem, 6vw, 5rem); }
 .how__head::after { content: "three small steps, one big ripple"; display: block; margin-top: 14px; font: 1.45rem var(--font-hand); color: var(--seal); transform: rotate(-2deg); }
-.how__step { position: relative; padding: 32px 24px 28px; background: rgba(255,250,242,.78); border: 1px solid rgba(36,30,26,.1); box-shadow: 0 12px 28px rgba(74,48,34,.08); transform: rotate(-1.2deg); transition: transform .45s cubic-bezier(.2,1.4,.4,1), box-shadow .3s ease; }
+.how__step { position: relative; padding: 32px 24px 28px; background: rgba(255,250,242,.78); border: 1px solid rgba(36,30,26,.1); box-shadow: 0 12px 28px rgba(74,48,34,.08); transform: rotate(-1.2deg); transition: box-shadow .3s ease, background-color .3s ease; }
 .how__step:nth-child(2) { transform: rotate(1.4deg) translateY(22px); }.how__step:nth-child(3) { transform: rotate(-.6deg) translateY(-6px); }
 .how__step:hover { transform: rotate(0) translateY(-10px) !important; box-shadow: 0 22px 38px rgba(74,48,34,.14); }
 .step-art { width: 70px; height: 70px; margin: 0 auto 12px; display: grid; place-items: center; border-radius: 50%; border: 1px solid currentColor; font: 2.5rem var(--font-hand); position: relative; }
