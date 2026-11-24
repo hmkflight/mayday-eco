@@ -743,17 +743,6 @@ section[id] { scroll-margin-top: var(--header-h); }
 @media (max-width: 899px) { .wall__progress { display: none; } }
 @media (prefers-reduced-motion: reduce) { .wall__progress { display: none; } }
 
-.wall__empty {
-  text-align: center;
-  padding-block: var(--sp-9);
-}
-.wall__empty p {
-  font-family: var(--font-hand);
-  font-size: var(--fs-h3);
-  color: var(--ink-soft);
-  margin-bottom: var(--sp-6);
-}
-
 /* ---------- 12. Share Your Story ---------- */
 .share { position: relative; overflow: hidden; isolation: isolate; }
 .share::before,

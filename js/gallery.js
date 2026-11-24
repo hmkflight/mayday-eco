@@ -120,7 +120,6 @@ export function renderGallery(approvedStories = []) {
   const track = document.getElementById("wall-track");
   const viewport = document.querySelector(".wall__viewport");
   const progress = document.getElementById("wall-progress");
-  const empty = document.getElementById("wall-empty");
   const countEl = document.getElementById("wall-count");
   if (!track) return;
 
@@ -149,12 +148,10 @@ export function renderGallery(approvedStories = []) {
   if (valid.length === 0) {
     if (viewport) viewport.hidden = true;
     if (progress) progress.hidden = true;
-    if (empty) empty.hidden = false;
     if (countEl) countEl.textContent = "";
     return;
   }
 
-  if (empty) empty.hidden = true;
   if (viewport) viewport.hidden = false;
   if (progress) progress.hidden = false;
 
