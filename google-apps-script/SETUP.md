@@ -12,6 +12,30 @@ approved-only web app URL are configured in `js/story-config.js`.
 - Respond: https://docs.google.com/forms/d/e/1FAIpQLSe57fkRAFkiVwyGQbiuRwxMwMdPUR6MFF96RRPcGPWd0RtGZw/viewform
 - Approved feed: https://script.google.com/macros/s/AKfycbzZsaAMQ4cmxh3c-Q1N8GSt_nT7W1thEL49NuAzc684k-eDZg_md1-5t7Drfv5d3c9P/exec
 
+## Deploy the response-mapping fix
+
+The website repository and the Apps Script project deploy separately. The
+current `Code.gs` now normalizes known question-title variants (including the
+renamed story, upload, and consent questions) and does not require an Age
+confirmation question. Copy the updated `google-apps-script/Code.gs` into the
+Automation project above, then:
+
+1. Save the script and run `syncResponses` once to backfill any responses that
+   arrived while the old mapping was active. Existing decisions are preserved.
+2. In **Deploy → Manage deployments**, edit the existing Web app deployment,
+   choose a new version, keep **Execute as me** and **Who has access: Anyone**,
+   and deploy. Do not create a second project or endpoint.
+3. In **Triggers**, confirm the existing `receiveStory` form-submit,
+   `reviewDecision` spreadsheet-edit, and `syncResponses` hourly triggers still
+   point to this project. Reauthorize Forms, Sheets, and Drive if Google asks.
+4. Submit one clearly labeled test response. It must arrive as **Pending** with
+   Story Type, Story / Description, and Private Upload populated. Approve it
+   manually, confirm **Published**, then reload mayday.eco. Reject the test
+   afterward to revoke its public media copy.
+
+Do not publish the response sheet, original uploads, or the private media
+folder. The web app returns only explicitly approved snapshots.
+
 ## Remove the live age confirmation question
 
 The repository no longer creates or validates **Age confirmation**. Pushing to

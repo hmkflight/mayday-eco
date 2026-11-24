@@ -46,7 +46,7 @@ function harness() {
     ContentService: { MimeType: { JSON: 'json' }, createTextOutput: value => ({ setMimeType: () => value }) },
   });
   vm.runInContext(backend, context);
-  function submit(kind, overrides = {}) {
+  function submit(kind, overrides = {}, renamedTitles = {}) {
     const id = `response-${responses.size}`;
     const fileId = `original-file-${responses.size}`;
     const source = {
@@ -58,15 +58,16 @@ function harness() {
       },
     };
     files.set(fileId, source);
+    const title = (key, fallback) => renamedTitles[key] || fallback;
     const answers = {
-      'Full Name': '<img src=x onerror=alert(1)>', 'Email Address': 'private@example.test',
-      'Instagram or TikTok Username': '@example',
-      'Who is submitting this story?': vm.runInContext('SELF', context),
-      'Permission to share': [vm.runInContext('PERMISSION', context)],
-      'Your story and media': [vm.runInContext('OWN_STORY', context)],
-      'How would you like to share your story?': vm.runInContext(kind === 'photo' ? 'PHOTO' : 'VIDEO', context),
-      [kind === 'photo' ? 'Upload a Photo of Yourself' : 'Upload Your Video']: [fileId],
-      ...(kind === 'photo' ? { 'Tell Us Your Story': '=A1 <script>private text</script>' } : {}),
+      [title('name', 'Full Name')]: '<img src=x onerror=alert(1)>', [title('email', 'Email Address')]: 'private@example.test',
+      [title('handle', 'Instagram or TikTok Username')]: '@example',
+      [title('role', 'Who is submitting this story?')]: vm.runInContext('SELF', context),
+      [title('sharePermission', 'Permission to share')]: [vm.runInContext('PERMISSION', context)],
+      [title('ownStory', 'Your story and media')]: [vm.runInContext('OWN_STORY', context)],
+      [title('type', 'How would you like to share your story?')]: vm.runInContext(kind === 'photo' ? 'PHOTO' : 'VIDEO', context),
+      [title(kind === 'photo' ? 'photoUpload' : 'videoUpload', kind === 'photo' ? 'Upload a Photo of Yourself' : 'Upload Your Video')]: [fileId],
+      ...(kind === 'photo' ? { [title('story', 'Tell Us Your Story')]: '=A1 <script>private text</script>' } : {}),
       ...overrides,
     };
     const response = { getId: () => id, getTimestamp: () => new Date('2026-09-21T12:00:00Z'),
@@ -182,6 +183,21 @@ test('frontend validates approved records and strips private fields', () => {
   ] });
   assert.equal(result.length, 1);
   assert.ok(!JSON.stringify(result).includes('secret'));
+});
+
+test('renamed form questions still map to the private review fields', () => {
+  const h = harness();
+  h.submit('photo', {}, {
+    name: 'Name', email: 'Email', handle: 'Social Username', role: 'Who is submitting?',
+    type: 'Story Type', photoUpload: 'Upload a Photo', story: 'Story / Description',
+    sharePermission: 'Permission', ownStory: 'Story and media',
+  });
+  assert.equal(h.rows[1][0], 'Pending');
+  assert.equal(h.rows[1][5], 'photo');
+  assert.match(h.rows[1][6], /private text/);
+  assert.match(h.rows[1][7], /original-file-0/);
+  h.decide(2, 'Approved');
+  assert.equal(h.feed().stories.length, 1);
 });
 
 test('only actual Google responder URLs can activate links', () => {

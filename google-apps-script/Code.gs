@@ -62,15 +62,15 @@ function prepareForm() {
 function validateForm_() {
   const form = FormApp.openById(FORM_ID);
   const titles = form.getItems().map(item => item.getTitle());
-  ['Full Name', 'Email Address', 'How would you like to share your story?',
-    'Tell Us Your Story', 'Permission to share', 'Your story and media', 'Who is submitting this story?',
-    'Parent / Legal Guardian Full Name', 'Parent / Legal Guardian Email Address', 'Parent / Legal Guardian Permission'].forEach(title => {
-    if (titles.filter(t => t === title).length !== 1) throw new Error('Missing or duplicate question: ' + title);
+  ['name', 'email', 'type', 'story', 'sharePermission', 'ownStory', 'role',
+    'guardianName', 'guardianEmail', 'guardianPermission'].forEach(key => {
+    const matches = titles.filter(title => QUESTION_ALIASES[key].some(alias => normalizeLabel_(alias) === normalizeLabel_(title)));
+    if (matches.length !== 1) throw new Error('Missing or duplicate question for: ' + key);
   });
-  ['Upload a Photo of Yourself', 'Upload Your Video'].forEach(title => {
-    const items = form.getItems().filter(item => item.getTitle() === title);
+  [['photoUpload', 'photo'], ['videoUpload', 'video']].forEach(([key, label]) => {
+    const items = form.getItems().filter(item => QUESTION_ALIASES[key].some(alias => normalizeLabel_(alias) === normalizeLabel_(item.getTitle())));
     if (items.length !== 1 || String(items[0].getType()) !== 'FILE_UPLOAD') {
-      throw new Error('Create the required file-upload question in Google Forms: ' + title);
+      throw new Error('Create the required ' + label + ' file-upload question in Google Forms.');
     }
   });
   return form;
@@ -119,31 +119,67 @@ function answers_(response) {
   return answers;
 }
 
+// Form editors sometimes adjust question wording after the automation is
+// installed. Match known, intentional title variants by normalized label so a
+// harmless rename does not turn a valid response into an Invalid row. This is
+// question-title matching only; consent values are still checked exactly.
+function normalizeLabel_(value) {
+  return String(value || '').toLowerCase().replace(/[’']/g, '').replace(/[^a-z0-9]+/g, ' ').trim();
+}
+
+const QUESTION_ALIASES = Object.freeze({
+  name: ['Full Name', 'Name', 'Your Name'],
+  email: ['Email Address', 'Email', 'Your Email Address'],
+  handle: ['Instagram or TikTok Username', 'Instagram or TikTok handle', 'Social Username'],
+  role: ['Who is submitting this story?', 'Who is submitting?', 'Story submitter'],
+  type: ['How would you like to share your story?', 'How would you like to share?', 'Story Type', 'Story format'],
+  photoUpload: ['Upload a Photo of Yourself', 'Upload Your Photo', 'Upload a Photo', 'Photo Upload'],
+  videoUpload: ['Upload Your Video', 'Upload a Video', 'Video Upload'],
+  story: ['Tell Us Your Story', 'Tell us your story', 'Story / Description', 'Story Description', 'Your Story'],
+  videoDescription: ['Video Description (optional)', 'Video Description', 'Describe Your Video'],
+  sharePermission: ['Permission to share', 'Permission to Share', 'Permission'],
+  ownStory: ['Your story and media', 'Your Story and Media', 'Story and media'],
+  guardianName: ['Parent / Legal Guardian Full Name', 'Parent or Legal Guardian Full Name', 'Guardian Full Name'],
+  guardianEmail: ['Parent / Legal Guardian Email Address', 'Parent or Legal Guardian Email Address', 'Guardian Email Address'],
+  guardianPermission: ['Parent / Legal Guardian Permission', 'Parent or Legal Guardian Permission', 'Guardian Permission'],
+});
+
+function answer_(answers, key) {
+  const keys = Object.keys(answers);
+  const aliases = QUESTION_ALIASES[key] || [];
+  for (const alias of aliases) {
+    const normalized = normalizeLabel_(alias);
+    const actual = keys.find(title => normalizeLabel_(title) === normalized);
+    if (actual) return answers[actual];
+  }
+  return undefined;
+}
+
 function checked_(answer, expected) { return Array.isArray(answer) && answer.length === 1 && answer[0] === expected; }
 
 function storyFromResponse_(response) {
   const a = answers_(response);
   const text = value => typeof value === 'string' ? value.trim() : '';
-  const type = a['How would you like to share your story?'];
+  const type = answer_(a, 'type');
   const photo = type === PHOTO;
-  const role = a['Who is submitting this story?'];
+  const role = answer_(a, 'role');
   const guardian = role === GUARDIAN;
-  const files = a[photo ? 'Upload a Photo of Yourself' : 'Upload Your Video'];
-  if (![PHOTO, VIDEO].includes(type) || ![SELF, GUARDIAN].includes(role) || !text(a['Full Name']) || !text(a['Email Address']) ||
-      (guardian && (!text(a['Parent / Legal Guardian Full Name']) || !text(a['Parent / Legal Guardian Email Address']) ||
-        !checked_(a['Parent / Legal Guardian Permission'], GUARDIAN_PERMISSION))) ||
-      !checked_(a['Permission to share'], PERMISSION) || !checked_(a['Your story and media'], OWN_STORY) ||
+  const files = answer_(a, photo ? 'photoUpload' : 'videoUpload');
+  if (![PHOTO, VIDEO].includes(type) || ![SELF, GUARDIAN].includes(role) || !text(answer_(a, 'name')) || !text(answer_(a, 'email')) ||
+      (guardian && (!text(answer_(a, 'guardianName')) || !text(answer_(a, 'guardianEmail')) ||
+        !checked_(answer_(a, 'guardianPermission'), GUARDIAN_PERMISSION))) ||
+      !checked_(answer_(a, 'sharePermission'), PERMISSION) || !checked_(answer_(a, 'ownStory'), OWN_STORY) ||
       !Array.isArray(files) || files.length !== 1 ||
-      !/^[\w-]{10,200}$/.test(files[0]) || (photo && !text(a['Tell Us Your Story']))) {
+      !/^[\w-]{10,200}$/.test(files[0]) || (photo && !text(answer_(a, 'story')))) {
     throw new Error('Required identity, media, story, or permission is missing. Do not publish.');
   }
   return {
-    id: response.getId(), name: text(a['Full Name']), email: text(a['Email Address']),
-    handle: text(a['Instagram or TikTok Username']), mediaType: photo ? 'photo' : 'video-drive',
-    excerpt: text(a[photo ? 'Tell Us Your Story' : 'Video Description (optional)']),
+    id: response.getId(), name: text(answer_(a, 'name')), email: text(answer_(a, 'email')),
+    handle: text(answer_(a, 'handle')), mediaType: photo ? 'photo' : 'video-drive',
+    excerpt: text(answer_(a, photo ? 'story' : 'videoDescription')),
     sourceFileId: files[0], date: response.getTimestamp().toISOString(), guardian,
-    guardianName: guardian ? text(a['Parent / Legal Guardian Full Name']) : '',
-    guardianEmail: guardian ? text(a['Parent / Legal Guardian Email Address']) : '',
+    guardianName: guardian ? text(answer_(a, 'guardianName')) : '',
+    guardianEmail: guardian ? text(answer_(a, 'guardianEmail')) : '',
   };
 }
 
