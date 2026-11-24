@@ -102,12 +102,12 @@ function renderCard(t, isNew) {
       ? `<span class="card__handle">${platformIcon}${escapeHtml(t.handle)}</span>`
       : "";
 
-  return `<div class="card-wrap${t.isSample ? " card-wrap--sample" : ""}">
+  return `<div class="card-wrap">
     ${PUSHPIN_SVG}
     ${isNew ? `<span class="new-tag">new</span>` : ""}
     <article class="card torn">
       ${renderMedia(t)}
-      ${t.excerpt ? `<p class="card__excerpt${t.isSample ? "" : " card__excerpt--full"}">${escapeHtml(t.excerpt)}</p>` : ""}
+      ${t.excerpt ? `<p class="card__excerpt card__excerpt--full">${escapeHtml(t.excerpt)}</p>` : ""}
       <div class="card__footer">
         <span class="card__name">${escapeHtml(t.name)}</span>
         ${handle}
@@ -158,17 +158,17 @@ export function renderGallery(approvedStories = []) {
   if (viewport) viewport.hidden = false;
   if (progress) progress.hidden = false;
 
-  const newestNonSample = valid.find((t) => !t.isSample && !t.isPlaceholder);
-  track.classList.toggle("wall__track--stories", !!newestNonSample);
-  if (progress) progress.hidden = !!newestNonSample;
+  const newestStory = valid.find((t) => !t.isPlaceholder);
+  track.classList.toggle("wall__track--stories", !!newestStory);
+  if (progress) progress.hidden = !!newestStory;
 
   track.innerHTML = valid
-    .map((t) => renderCard(t, !!(newestNonSample && t.id === newestNonSample.id)))
+    .map((t) => renderCard(t, !!(newestStory && t.id === newestStory.id)))
     .join("");
 
   activateYoutubeFacades(track);
 
-  const realCount = valid.filter((t) => !t.isSample && !t.isPlaceholder).length;
+  const realCount = valid.filter((t) => !t.isPlaceholder).length;
   if (countEl) {
     countEl.textContent = realCount > 0 ? `${realCount} stor${realCount === 1 ? "y" : "ies"} and counting` : "";
   }

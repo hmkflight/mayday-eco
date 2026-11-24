@@ -11,9 +11,8 @@ TikTok handle is displayed and linked so they get public credit. All testimonies
 together on the Wall of Wishes, so the site becomes a growing, visible chain of people
 inspiring other people to go grant a wish too.
 
-The website remains static with no build step. Existing sample stories live in
-`js/testimonies.js`. The new Google Forms integration uses a private review sheet
-and Google Apps Script to publish an approved-only feed. The published responder
+The website remains static with no build step. The Google Forms integration uses a
+private review sheet and Google Apps Script to publish an approved-only feed. The published responder
 and feed URLs are configured in `js/story-config.js`.
 See [Share Your Story setup and review](google-apps-script/SETUP.md).
 
@@ -59,7 +58,6 @@ nothing else to wire up.
   alt: "Plain description of the image, for screen readers",
   excerpt: "Two to three sentences, in their words, about how granting the wish felt.",
   date: "2026-08-27",          // ISO date (YYYY-MM-DD) — also the sort key and "new" tag source
-  // isPlaceholder: true,      // omit this line entirely for real entries
 }
 ```
 
@@ -92,8 +90,6 @@ you through the DNS records in their dashboard.
   parents/legal guardians may submit a child's story with additional consent.
 - Keep every new response Pending until reviewed. Child stories additionally
   require the reviewer to check Guardian Consent Verified before approval.
-- Existing fictional sample cards remain labeled. Remove them from
-  `js/testimonies.js` when you are ready to replace them with real approved stories.
 - `assets/og-image.png` was generated in this build from `assets/og-image.svg` via
   `librsvg` (`rsvg-convert -w 1200 -h 630 -o assets/og-image.png assets/og-image.svg`). If
   you edit `og-image.svg` later, re-run that command to regenerate the PNG — social
