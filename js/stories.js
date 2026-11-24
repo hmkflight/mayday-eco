@@ -51,6 +51,9 @@ export function normalizeApprovedStories(payload) {
     src: story.mediaType === "photo"
       ? `https://drive.google.com/thumbnail?id=${encodeURIComponent(story.driveFileId)}&sz=w1000`
       : null,
+    fullSrc: story.mediaType === "photo"
+      ? `https://drive.google.com/uc?export=view&id=${encodeURIComponent(story.driveFileId)}`
+      : null,
     alt: `Photo shared by ${story.name}`,
     excerpt: typeof story.excerpt === "string" ? story.excerpt : "",
     date: story.date,

@@ -103,6 +103,7 @@ for (const type of ['photo', 'video']) {
     const cards = normalizeApprovedStories(h.feed());
     assert.equal(cards.length, 1);
     assert.equal(cards[0].handle, '@example');
+    if (type === 'photo') assert.match(cards[0].fullSrc, /uc\?export=view&id=/);
     if (type === 'video') assert.equal(cards[0].excerpt, '');
     h.decide(2, 'Rejected');
     assert.deepEqual(h.feed().stories, []);
@@ -211,6 +212,9 @@ test('gallery renders photos and captionless videos and escapes submitted HTML',
     renderGallery(normalizeApprovedStories(h.feed()));
     assert.match(track.innerHTML, /drive\.google\.com\/thumbnail/);
     assert.match(track.innerHTML, /drive\.google\.com\/file\/d\/approved-file-1\/preview/);
+    assert.match(track.innerHTML, /card--interactive/);
+    assert.match(track.innerHTML, /card__read-more/);
+    assert.doesNotMatch(track.innerHTML, /card__excerpt--full/);
     assert.match(track.innerHTML, /&lt;img src=x onerror=alert\(1\)&gt;/);
     assert.ok(!track.innerHTML.includes('<script>private text</script>'));
     assert.equal(elements['wall-count'].textContent, '2 stories and counting');

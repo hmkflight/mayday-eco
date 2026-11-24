@@ -79,6 +79,36 @@ function renderMedia(t) {
   return "";
 }
 
+function renderFullMedia(t) {
+  if (t.mediaType === "photo") {
+    const src = t.fullSrc || t.src;
+    return `<div class="story-modal__media">
+      <img src="${escapeHtml(src)}" alt="${escapeHtml(t.alt)}" decoding="async">
+    </div>`;
+  }
+  if (t.mediaType === "video-drive") {
+    return `<div class="story-modal__media story-modal__media--video">
+      <iframe src="https://drive.google.com/file/d/${encodeURIComponent(t.driveFileId)}/preview"
+        title="${escapeHtml(t.name)}'s video testimony" loading="lazy" allow="autoplay; fullscreen" allowfullscreen></iframe>
+    </div>`;
+  }
+  if (t.mediaType === "video-file") {
+    return `<div class="story-modal__media story-modal__media--video">
+      <video controls preload="metadata"${t.poster ? ` poster="${escapeHtml(t.poster)}"` : ""} aria-label="${escapeHtml(t.name)}'s video testimony">
+        <source src="${escapeHtml(t.src)}">
+      </video>
+    </div>`;
+  }
+  if (t.mediaType === "video-youtube") {
+    return `<div class="story-modal__media story-modal__media--video">
+      <iframe src="https://www.youtube-nocookie.com/embed/${encodeURIComponent(t.youtubeId)}"
+        title="${escapeHtml(t.name)}'s video testimony" loading="lazy"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; picture-in-picture" allowfullscreen></iframe>
+    </div>`;
+  }
+  return "";
+}
+
 function activateYoutubeFacades(root) {
   root.querySelectorAll(".card__media-btn[data-youtube-id]").forEach((btn) => {
     btn.addEventListener("click", () => {
@@ -102,18 +132,101 @@ function renderCard(t, isNew) {
       ? `<span class="card__handle">${platformIcon}${escapeHtml(t.handle)}</span>`
       : "";
 
+  const preview = t.excerpt || "A story shared after granting a wish.";
   return `<div class="card-wrap">
     ${PUSHPIN_SVG}
     ${isNew ? `<span class="new-tag">new</span>` : ""}
-    <article class="card torn">
+    <article class="card card--interactive torn" tabindex="0" role="button" data-story-id="${escapeHtml(t.id)}" aria-label="Read ${escapeHtml(t.name)}'s full story">
       ${renderMedia(t)}
-      ${t.excerpt ? `<p class="card__excerpt card__excerpt--full">${escapeHtml(t.excerpt)}</p>` : ""}
+      <p class="card__excerpt">${escapeHtml(preview)}</p>
+      <span class="card__read-more">Read full story <span aria-hidden="true">↗</span></span>
       <div class="card__footer">
         <span class="card__name">${escapeHtml(t.name)}</span>
         ${handle}
       </div>
     </article>
   </div>`;
+}
+
+function createStoryModal() {
+  if (document.getElementById("story-modal")) return document.getElementById("story-modal");
+  const modal = document.createElement("div");
+  modal.id = "story-modal";
+  modal.className = "story-modal";
+  modal.hidden = true;
+  modal.setAttribute("aria-hidden", "true");
+  modal.innerHTML = `<div class="story-modal__backdrop" data-modal-close></div>
+    <div class="story-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="story-modal-title" tabindex="-1">
+      <button type="button" class="story-modal__close" data-modal-close aria-label="Close story">&times;</button>
+      <div class="story-modal__content">
+        <div id="story-modal-media"></div>
+        <p class="story-modal__eyebrow">a kindness story</p>
+        <h2 id="story-modal-title"></h2>
+        <div class="story-modal__copy" id="story-modal-copy"></div>
+      </div>
+    </div>`;
+  document.body.appendChild(modal);
+  return modal;
+}
+
+function activateStoryModal(root, stories) {
+  if (!document.body) return;
+  const modal = createStoryModal();
+  const dialog = modal.querySelector(".story-modal__dialog");
+  const closeButton = modal.querySelector(".story-modal__close");
+  const media = modal.querySelector("#story-modal-media");
+  const title = modal.querySelector("#story-modal-title");
+  const copy = modal.querySelector("#story-modal-copy");
+  const close = () => {
+    if (modal.hidden) return;
+    modal.hidden = true;
+    modal.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("story-modal-open");
+    media.innerHTML = "";
+    if (modal._returnFocus && typeof modal._returnFocus.focus === "function") modal._returnFocus.focus();
+    modal._returnFocus = null;
+  };
+
+  const open = (card) => {
+    const story = stories.get(card.dataset.storyId);
+    if (!story) return;
+    modal._returnFocus = card;
+    title.textContent = story.name;
+    copy.textContent = story.excerpt || "This story was shared after granting a wish.";
+    media.innerHTML = renderFullMedia(story);
+    modal.hidden = false;
+    modal.setAttribute("aria-hidden", "false");
+    document.body.classList.add("story-modal-open");
+    closeButton.focus();
+  };
+
+  root.querySelectorAll(".card--interactive").forEach((card) => {
+    card.addEventListener("click", (event) => {
+      if (event.target.closest("a, button, video, iframe")) return;
+      open(card);
+    });
+    card.addEventListener("keydown", (event) => {
+      if (event.target.closest("a, button, video, iframe")) return;
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        open(card);
+      }
+    });
+  });
+  if (!modal.dataset.bound) {
+    modal.querySelectorAll("[data-modal-close]").forEach((button) => button.addEventListener("click", close));
+    modal.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") close();
+      if (event.key !== "Tab") return;
+      const focusables = [closeButton, ...dialog.querySelectorAll("a[href], button:not([disabled]), iframe, video")]
+        .filter((element, index, all) => all.indexOf(element) === index);
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+    });
+    modal.dataset.bound = "true";
+  }
 }
 
 export function renderGallery(approvedStories = []) {
@@ -164,6 +277,7 @@ export function renderGallery(approvedStories = []) {
     .join("");
 
   activateYoutubeFacades(track);
+  activateStoryModal(track, new Map(valid.map((story) => [story.id, story])));
 
   const realCount = valid.filter((t) => !t.isPlaceholder).length;
   if (countEl) {
