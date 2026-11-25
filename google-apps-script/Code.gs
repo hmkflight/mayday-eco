@@ -13,7 +13,7 @@ const SELF = 'I am sharing my own story';
 const GUARDIAN = 'I am a parent/legal guardian submitting a child’s story';
 const GUARDIAN_PERMISSION = 'I confirm that I am this child’s parent or legal guardian and authorize One Simple Wish to publish the child’s name, photo/video, story, and social media username (if provided) on its website and social media. I have reviewed this submission and consent to its use.';
 const CONFIRMATION = 'Thank you for sharing your story! Your submission has been received and will be reviewed before being published on our website.';
-const HEADERS = ['Decision', 'Received', 'Full Name', 'Email Address', 'Social Username', 'Story Type', 'Story / Description', 'Private Upload', 'Response ID', 'Published Snapshot', 'Publication Result', 'Guardian Name (private)', 'Guardian Email (private)', 'Guardian Consent Verified'];
+const HEADERS = ['Decision', 'Received', 'Full Name', 'Email Address', 'Social Username', 'Story Type', 'Story / Description', 'Private Upload', 'Response ID', 'Published Snapshot', 'Publication Result', 'Guardian Name (private)', 'Guardian Email (private)', 'Guardian Consent Verified', 'Wish Recipient', 'Gift Details', 'Why This Wish'];
 
 // Run once on the existing draft. File-upload questions must be added in the
 // Forms editor: Google does not offer an API for creating them.
@@ -93,6 +93,15 @@ function setupReview() {
     sheet.setColumnWidth(7, 420);
     sheet.hideColumns(9, 2);
   }
+  // Append new review fields without shifting the technical snapshot columns.
+  // Existing rows and decisions therefore remain compatible.
+  if (sheet.getLastColumn() < HEADERS.length) {
+    const firstNewColumn = sheet.getLastColumn() + 1;
+    const newHeaders = HEADERS.slice(firstNewColumn - 1);
+    sheet.getRange(1, firstNewColumn, 1, newHeaders.length).setValues([newHeaders]);
+    sheet.getRange(1, firstNewColumn, 1, newHeaders.length).setFontWeight('bold').setBackground('#f4ede1');
+    sheet.setColumnWidths(firstNewColumn, newHeaders.length, 220);
+  }
   if (!props.getProperty('PUBLIC_MEDIA_FOLDER_ID')) {
     // The folder itself stays private. Only approved individual copies are public.
     const folder = DriveApp.createFolder(TITLE + ' — Approved Media');
@@ -142,6 +151,9 @@ const QUESTION_ALIASES = Object.freeze({
   guardianName: ['Parent / Legal Guardian Full Name', 'Parent or Legal Guardian Full Name', 'Guardian Full Name'],
   guardianEmail: ['Parent / Legal Guardian Email Address', 'Parent or Legal Guardian Email Address', 'Guardian Email Address'],
   guardianPermission: ['Parent / Legal Guardian Permission', 'Parent or Legal Guardian Permission', 'Guardian Permission'],
+  recipient: ['Who did you grant a wish for?', 'Who did you grant the wish for?', 'Wish Recipient', 'Recipient'],
+  gift: ['What did you purchase or give to fulfill their wish?', 'What did you purchase or give?', 'Gift Details', 'What was gifted'],
+  reason: ['Why did you choose to grant this person\'s wish?', 'Why did you choose this wish?', 'Why This Wish', 'Reason for granting the wish'],
 });
 
 function answer_(answers, key) {
@@ -155,6 +167,11 @@ function answer_(answers, key) {
   return undefined;
 }
 
+function hasAnswer_(answers, key) {
+  const aliases = QUESTION_ALIASES[key] || [];
+  return Object.keys(answers).some(title => aliases.some(alias => normalizeLabel_(alias) === normalizeLabel_(title)));
+}
+
 function checked_(answer, expected) { return Array.isArray(answer) && answer.length === 1 && answer[0] === expected; }
 
 function storyFromResponse_(response) {
@@ -165,12 +182,14 @@ function storyFromResponse_(response) {
   const role = answer_(a, 'role');
   const guardian = role === GUARDIAN;
   const files = answer_(a, photo ? 'photoUpload' : 'videoUpload');
+  const detailsPresent = ['recipient', 'gift', 'reason'].some(key => hasAnswer_(a, key));
   if (![PHOTO, VIDEO].includes(type) || ![SELF, GUARDIAN].includes(role) || !text(answer_(a, 'name')) || !text(answer_(a, 'email')) ||
       (guardian && (!text(answer_(a, 'guardianName')) || !text(answer_(a, 'guardianEmail')) ||
         !checked_(answer_(a, 'guardianPermission'), GUARDIAN_PERMISSION))) ||
       !checked_(answer_(a, 'sharePermission'), PERMISSION) || !checked_(answer_(a, 'ownStory'), OWN_STORY) ||
       !Array.isArray(files) || files.length !== 1 ||
-      !/^[\w-]{10,200}$/.test(files[0]) || (photo && !text(answer_(a, 'story')))) {
+      !/^[\w-]{10,200}$/.test(files[0]) || (photo && !text(answer_(a, 'story'))) ||
+      (detailsPresent && (!text(answer_(a, 'recipient')) || !text(answer_(a, 'gift')) || !text(answer_(a, 'reason'))))) {
     throw new Error('Required identity, media, story, or permission is missing. Do not publish.');
   }
   return {
@@ -180,6 +199,9 @@ function storyFromResponse_(response) {
     sourceFileId: files[0], date: response.getTimestamp().toISOString(), guardian,
     guardianName: guardian ? text(answer_(a, 'guardianName')) : '',
     guardianEmail: guardian ? text(answer_(a, 'guardianEmail')) : '',
+    recipient: text(answer_(a, 'recipient')),
+    gift: text(answer_(a, 'gift')),
+    reason: text(answer_(a, 'reason')),
   };
 }
 
@@ -199,16 +221,18 @@ function queueResponse_(response) {
   const a = answers_(response);
   let story;
   try { story = storyFromResponse_(response); } catch (error) {
-    sheet.appendRow(['Invalid', response.getTimestamp(), cellText_(String(a['Full Name'] || '')), '', '', '', '', '', response.getId(), '', error.message, '', '', false]);
+    sheet.appendRow(['Invalid', response.getTimestamp(), cellText_(String(answer_(a, 'name') || '')), '', '', '', '', '', response.getId(), '', error.message, '', '', false, '', '', '']);
     return;
   }
   sheet.appendRow(['Pending', story.date, cellText_(story.name), cellText_(story.email), cellText_(story.handle),
     story.mediaType, cellText_(story.excerpt), 'https://drive.google.com/file/d/' + story.sourceFileId + '/view', story.id, '',
-    story.guardian ? 'Verify guardian consent before approving' : 'Awaiting review', cellText_(story.guardianName), cellText_(story.guardianEmail), false]);
+    story.guardian ? 'Verify guardian consent before approving' : 'Awaiting review', cellText_(story.guardianName), cellText_(story.guardianEmail), false,
+    cellText_(story.recipient), cellText_(story.gift), cellText_(story.reason)]);
   sheet.getRange(sheet.getLastRow(), 14).insertCheckboxes();
   sheet.getRange(sheet.getLastRow(), 1).setDataValidation(SpreadsheetApp.newDataValidation()
     .requireValueInList(['Pending', 'Approved', 'Rejected'], true).setAllowInvalid(false).build());
   sheet.getRange(sheet.getLastRow(), 7).setWrap(true);
+  sheet.getRange(sheet.getLastRow(), 15, 1, 3).setWrap(true);
 }
 
 // Backfill missed triggers without duplicating or resetting review decisions.
@@ -270,6 +294,7 @@ function publishDecision_(sheet, rowNumber) {
     const snapshot = {
       id: story.id, status: 'Approved', name: story.name, handle: story.handle,
       mediaType: story.mediaType, driveFileId: copy.getId(), excerpt: story.excerpt, date: story.date,
+      recipient: story.recipient, gift: story.gift, reason: story.reason,
     };
     snapshotCell.setValue(JSON.stringify(snapshot));
     resultCell.setValue('Published ' + new Date().toISOString());
@@ -291,7 +316,8 @@ function doGet() {
       const s = JSON.parse(row[9]);
       if (s.status !== 'Approved' || !/^[\w-]{10,200}$/.test(s.driveFileId)) return [];
       return [{ id: s.id, status: 'Approved', name: s.name, handle: s.handle,
-        mediaType: s.mediaType, driveFileId: s.driveFileId, excerpt: s.excerpt, date: s.date }];
+        mediaType: s.mediaType, driveFileId: s.driveFileId, excerpt: s.excerpt, date: s.date,
+        recipient: s.recipient || '', gift: s.gift || '', reason: s.reason || '' }];
     } catch (_) { return []; }
   });
   return ContentService.createTextOutput(JSON.stringify({ version: 1, stories }))

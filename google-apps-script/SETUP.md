@@ -36,6 +36,30 @@ Automation project above, then:
 Do not publish the response sheet, original uploads, or the private media
 folder. The web app returns only explicitly approved snapshots.
 
+## Add wish recipient details to the existing Form
+
+Google Forms does not safely insert these questions into an already-configured
+branching form from the website repository. In the existing Form editor, add
+the following required questions to both the photo and video story path before
+the Permission section (the exact placement can be adjusted without changing
+the existing routing):
+
+1. **Who did you grant a wish for?** — Short answer. Description: “Share the
+   recipient's first name, nickname, or a general description. Please don't
+   include private identifying information.”
+2. **What did you purchase or give to fulfill their wish?** — Paragraph.
+   Description: “Tell us what you gifted and how it helped fulfill their wish.”
+3. **Why did you choose to grant this person's wish?** — Paragraph.
+   Description: “What inspired you to choose this wish? What made it meaningful
+   to you?”
+
+Keep the existing questions, upload requirements, branching, and responses.
+After saving the Form, copy the updated `Code.gs` into Apps Script and run
+`setupReview` once. It appends **Wish Recipient**, **Gift Details**, and **Why
+This Wish** to the existing private Review sheet without shifting its technical
+columns. Then deploy a new Web app version as described above. Responses made
+before these questions existed remain valid and will have blank detail fields.
+
 ## Remove the live age confirmation question
 
 The repository no longer creates or validates **Age confirmation**. Pushing to

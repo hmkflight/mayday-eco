@@ -1,5 +1,5 @@
 // mayday.eco — init, gallery render, header/menu behavior, and all motion.
-import { renderGallery } from "./gallery.js?v=20260922b";
+import { renderGallery } from "./gallery.js?v=20261125a";
 import { configureStoryLinks, loadApprovedStories } from "./stories.js";
 
 const motionCanRun = typeof gsap !== "undefined" && typeof ScrollTrigger !== "undefined" &&

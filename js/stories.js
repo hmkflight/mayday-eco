@@ -56,6 +56,9 @@ export function normalizeApprovedStories(payload) {
       : null,
     alt: `Photo shared by ${story.name}`,
     excerpt: typeof story.excerpt === "string" ? story.excerpt : "",
+    recipient: typeof story.recipient === "string" ? story.recipient : "",
+    gift: typeof story.gift === "string" ? story.gift : "",
+    reason: typeof story.reason === "string" ? story.reason : "",
     date: story.date,
   }));
 }

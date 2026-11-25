@@ -46,7 +46,7 @@ function harness() {
     ContentService: { MimeType: { JSON: 'json' }, createTextOutput: value => ({ setMimeType: () => value }) },
   });
   vm.runInContext(backend, context);
-  function submit(kind, overrides = {}, renamedTitles = {}) {
+  function submit(kind, overrides = {}, renamedTitles = {}, wishDetails = null) {
     const id = `response-${responses.size}`;
     const fileId = `original-file-${responses.size}`;
     const source = {
@@ -70,6 +70,11 @@ function harness() {
       ...(kind === 'photo' ? { [title('story', 'Tell Us Your Story')]: '=A1 <script>private text</script>' } : {}),
       ...overrides,
     };
+    if (wishDetails) {
+      answers[title('recipient', 'Who did you grant a wish for?')] = wishDetails.recipient;
+      answers[title('gift', 'What did you purchase or give to fulfill their wish?')] = wishDetails.gift;
+      answers[title('reason', "Why did you choose to grant this person's wish?")] = wishDetails.reason;
+    }
     const response = { getId: () => id, getTimestamp: () => new Date('2026-09-21T12:00:00Z'),
       getItemResponses: () => Object.entries(answers).map(([title, value]) => ({ getItem: () => ({ getTitle: () => title }), getResponse: () => value })) };
     responses.set(id, response);
@@ -200,6 +205,34 @@ test('renamed form questions still map to the private review fields', () => {
   assert.equal(h.feed().stories.length, 1);
 });
 
+test('new wish details are stored and published, while legacy responses remain valid', () => {
+  const current = harness();
+  current.submit('photo', {}, {}, {
+    recipient: 'A nickname only', gift: 'A warm winter coat', reason: 'Their request spoke to me.',
+  });
+  assert.equal(current.rows[1][0], 'Pending');
+  assert.equal(current.rows[1][14], 'A nickname only');
+  assert.equal(current.rows[1][15], 'A warm winter coat');
+  assert.equal(current.rows[1][16], 'Their request spoke to me.');
+  current.decide(2, 'Approved');
+  const published = current.feed().stories[0];
+  assert.equal(published.recipient, 'A nickname only');
+  assert.equal(published.gift, 'A warm winter coat');
+  assert.equal(published.reason, 'Their request spoke to me.');
+
+  const legacy = harness();
+  legacy.submit('photo');
+  assert.equal(legacy.rows[1][0], 'Pending');
+  assert.equal(legacy.rows[1][14], '');
+});
+
+test('new details are required only when the new questions are present', () => {
+  const h = harness();
+  h.submit('photo', {}, {}, { recipient: 'Only recipient', gift: '', reason: 'Missing gift must fail.' });
+  assert.equal(h.rows[1][0], 'Invalid');
+  assert.match(h.rows[1][10], /Required identity/);
+});
+
 test('only actual Google responder URLs can activate links', () => {
   assert.equal(isFormUrl('https://docs.google.com/forms/d/e/example/viewform'), true);
   for (const url of ['', 'javascript:alert(1)', 'https://evil.test/forms/d/e/example/viewform', 'https://docs.google.com/forms/d/example/edit']) {
@@ -234,5 +267,18 @@ test('gallery renders photos and captionless videos and escapes submitted HTML',
     assert.match(track.innerHTML, /&lt;img src=x onerror=alert\(1\)&gt;/);
     assert.ok(!track.innerHTML.includes('<script>private text</script>'));
     assert.equal(elements['wall-count'].textContent, '2 stories and counting');
+  } finally { delete globalThis.document; }
+});
+
+test('gallery renders approved wish details as escaped postcard and modal data', () => {
+  const track = { innerHTML: '', querySelectorAll: () => [], classList: { toggle() {} } };
+  globalThis.document = { getElementById: id => id === 'wall-track' ? track : id === 'wall-progress' ? {} : id === 'wall-count' ? {} : null, querySelector: () => ({}) };
+  try {
+    renderGallery([{
+      id: 'submission-details', name: 'Storyteller', mediaType: 'photo', src: 'https://example.test/photo.jpg',
+      alt: 'Approved photo', excerpt: 'A short story.', recipient: '<private>', gift: 'A bike & helmet', reason: 'A meaningful choice', date: '2026-01-01',
+    }]);
+    assert.match(track.innerHTML, /For:<\/strong> &lt;private&gt;/);
+    assert.match(track.innerHTML, /Gift:<\/strong> A bike &amp; helmet/);
   } finally { delete globalThis.document; }
 });

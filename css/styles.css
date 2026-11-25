@@ -685,6 +685,20 @@ section[id] { scroll-margin-top: var(--header-h); }
   font-family: var(--font-hand);
   font-size: var(--fs-body);
 }
+.card__details {
+  margin-bottom: var(--sp-3);
+  color: var(--ink-soft);
+  font-family: var(--font-ui);
+  font-size: var(--fs-small);
+  line-height: 1.4;
+}
+.card__details p {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+.card__details strong { color: var(--seal); font-weight: 600; }
 
 /* Approved stories need room for complete testimony and accessible media. */
 .wall__track.wall__track--stories {
@@ -800,6 +814,16 @@ section[id] { scroll-margin-top: var(--header-h); }
   font-size: var(--fs-h3);
 }
 .story-modal__dialog h2 { margin-bottom: var(--sp-5); }
+.story-modal__details {
+  margin-bottom: var(--sp-5);
+  padding: var(--sp-4);
+  border-block: 1px solid var(--rule-card);
+  color: var(--ink-soft);
+  font-family: var(--font-ui);
+  font-size: var(--fs-small);
+}
+.story-modal__details p + p { margin-top: var(--sp-2); }
+.story-modal__details strong { color: var(--seal); }
 .story-modal__copy {
   max-width: 65ch;
   white-space: pre-wrap;

@@ -133,11 +133,18 @@ function renderCard(t, isNew) {
       : "";
 
   const preview = t.excerpt || "A story shared after granting a wish.";
+  const details = t.recipient || t.gift
+    ? `<div class="card__details">
+        ${t.recipient ? `<p><strong>For:</strong> ${escapeHtml(t.recipient)}</p>` : ""}
+        ${t.gift ? `<p><strong>Gift:</strong> ${escapeHtml(t.gift)}</p>` : ""}
+      </div>`
+    : "";
   return `<div class="card-wrap">
     ${PUSHPIN_SVG}
     ${isNew ? `<span class="new-tag">new</span>` : ""}
     <article class="card card--interactive torn" tabindex="0" role="button" data-story-id="${escapeHtml(t.id)}" aria-label="Read ${escapeHtml(t.name)}'s full story">
       ${renderMedia(t)}
+      ${details}
       <p class="card__excerpt">${escapeHtml(preview)}</p>
       <span class="card__read-more">Read full story <span aria-hidden="true">↗</span></span>
       <div class="card__footer">
@@ -162,6 +169,7 @@ function createStoryModal() {
         <div id="story-modal-media"></div>
         <p class="story-modal__eyebrow">a kindness story</p>
         <h2 id="story-modal-title"></h2>
+        <div class="story-modal__details" id="story-modal-details"></div>
         <div class="story-modal__copy" id="story-modal-copy"></div>
       </div>
     </div>`;
@@ -176,6 +184,7 @@ function activateStoryModal(root, stories) {
   const closeButton = modal.querySelector(".story-modal__close");
   const media = modal.querySelector("#story-modal-media");
   const title = modal.querySelector("#story-modal-title");
+  const details = modal.querySelector("#story-modal-details");
   const copy = modal.querySelector("#story-modal-copy");
   const close = () => {
     if (modal.hidden) return;
@@ -192,6 +201,11 @@ function activateStoryModal(root, stories) {
     if (!story) return;
     modal._returnFocus = card;
     title.textContent = story.name;
+    details.innerHTML = [
+      story.recipient ? `<p><strong>For:</strong> ${escapeHtml(story.recipient)}</p>` : "",
+      story.gift ? `<p><strong>Gift:</strong> ${escapeHtml(story.gift)}</p>` : "",
+      story.reason ? `<p><strong>Why this wish:</strong> ${escapeHtml(story.reason)}</p>` : "",
+    ].join("");
     copy.textContent = story.excerpt || "This story was shared after granting a wish.";
     media.innerHTML = renderFullMedia(story);
     modal.hidden = false;
